@@ -1,42 +1,40 @@
-name: Build
+name: SonarQube Scan
 
 on:
   push:
     branches:
-      - master
-  pull_request:
-    types: [opened, synchronize, reopened]
+      - main
 
 jobs:
-  sonarqube:
-    name: SonarQube
+  build:
     runs-on: windows-latest
 
     steps:
-      # Checkout del repository
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      # Creazione della cartella bin (compatibile con Windows)
-      - name: Creare la cartella bin
-        run: |
-          if (-not (Test-Path -Path "./bin")) { New-Item -ItemType Directory -Path "./bin" }
+    - name: Cache SonarScanner
+      uses: actions/cache@v4
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar-scanner-cli-7.0.2
+        restore-keys: |
+          ${{ runner.os }}-sonar-scanner-cli-7.0.2
 
-      # Compilazione del progetto Java (su Windows, usa PowerShell per trovare i file .java)
-      - name: Compilare il progetto Java
-        run: |
-          $files = Get-ChildItem -Recurse -Path ./src -Filter "*.java" # Trova tutti i file .java nella cartella src
-          if ($files.Count -gt 0) {
-            javac -d ./bin $files
-          } else {
-            Write-Error "Nessun file .java trovato nella cartella src"
-            exit 1
-          }
+    - name: Set up SonarScanner
+      uses: SonarSource/sonarqube-scan-action@v5
+      with:
+        sonarHostUrl: ${{ secrets.SONARQUBE_URL }}  # Inserisci l'URL del tuo server SonarQube o SonarCloud
+        sonarToken: ${{ secrets.SONARQUBE_TOKEN }}  # Token di autenticazione
 
-      # Esecuzione dell'analisi SonarQube
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: Run SonarScanner
+      run: |
+        echo "sonar.projectKey=enricobarbatano_esperimento" >> $GITHUB_ENV
+        echo "sonar.organization=enricobarbatano" >> $GITHUB_ENV
+        echo "sonar.sources=src" >> $GITHUB_ENV
+        echo "sonar.java.binaries=./bin" >> $GITHUB_ENV
+        echo "sonar.exclusions=**/*.java" >> $GITHUB_ENV
+        echo "sonar.sourceEncoding=UTF-8" >> $GITHUB_ENV
+        sonar-scanner.bat
+
 
