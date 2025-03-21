@@ -4,7 +4,7 @@ public class Cd extends ElementiBiblioteca{
 
     private String genereCd; //film,gioco,applicazione,etc.
     private int peso; //peso espresso in kb
-    final String unitàDiMisura= "Kb";
+    
 
     public Cd(String titolo, String autore, String genereCd, int peso) {
         super(titolo, autore);
