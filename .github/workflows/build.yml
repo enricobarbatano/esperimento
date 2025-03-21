@@ -17,4 +17,28 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectKey: your_project_key
+          organization: your_organization_key
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          sonar.projectKey: your_project_key
+          sonar.organization: your_organization_key
+name: Build
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  sonarqube:
+    name: SonarQube
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          projectKey: your_project_key
           o
