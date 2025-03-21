@@ -23,10 +23,16 @@ jobs:
         run: |
           if (-not (Test-Path -Path "./bin")) { New-Item -ItemType Directory -Path "./bin" }
 
-      # Compilazione del progetto Java
+      # Compilazione del progetto Java (su Windows, usa PowerShell per trovare i file .java)
       - name: Compilare il progetto Java
         run: |
-          javac -d ./bin $(find ./src -name "*.java")
+          $files = Get-ChildItem -Recurse -Path ./src -Filter "*.java" # Trova tutti i file .java nella cartella src
+          if ($files.Count -gt 0) {
+            javac -d ./bin $files
+          } else {
+            Write-Error "Nessun file .java trovato nella cartella src"
+            exit 1
+          }
 
       # Esecuzione dell'analisi SonarQube
       - name: SonarQube Scan
