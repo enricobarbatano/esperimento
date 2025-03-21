@@ -3,14 +3,14 @@ name: SonarCloud Scan
 on:
   push:
     branches:
-      - main  # Esegui l'analisi su push al ramo "main"
+      - master  # Esegui l'analisi su push al ramo "main"
   pull_request:
     branches:
-      - main  # Esegui l'analisi anche su pull request al ramo "main"
+      - master  # Esegui l'analisi anche su pull request al ramo "main"
 
 jobs:
   sonarcloud:
-    runs-on: ubuntu-latest  # Puoi usare windows-latest se desideri
+    runs-on: windows-latest  # Puoi usare windows-latest se desideri
 
     steps:
     - name: Checkout code
