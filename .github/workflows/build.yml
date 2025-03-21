@@ -18,10 +18,14 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-      # Compilazione del progetto Java (aggiungi questo passo)
+      # Creazione della cartella bin (compatibile con Windows)
+      - name: Creare la cartella bin
+        run: |
+          if (-not (Test-Path -Path "./bin")) { New-Item -ItemType Directory -Path "./bin" }
+
+      # Compilazione del progetto Java
       - name: Compilare il progetto Java
         run: |
-          mkdir -p bin
           javac -d ./bin $(find ./src -name "*.java")
 
       # Esecuzione dell'analisi SonarQube
